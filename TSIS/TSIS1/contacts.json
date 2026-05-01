@@ -1,0 +1,50 @@
+[
+    {
+        "name": "Alex",
+        "email": "alex@gmail.com",
+        "birthday": "2005-03-12",
+        "group": "mobile",
+        "phones": [
+            {
+                "number": "87001234567",
+                "type": "mobile"
+            },
+            {
+                "number": "87005555555",
+                "type": "work"
+            },
+            {
+                "number": "87676772323",
+                "type": "work"
+            }
+        ]
+    },
+    {
+        "name": "TestUser",
+        "email": null,
+        "birthday": "None",
+        "group": "Friends",
+        "phones": [
+            {
+                "number": "123456",
+                "type": "mobile"
+            },
+            {
+                "number": "777",
+                "type": "home"
+            }
+        ]
+    },
+    {
+        "name": "eldar",
+        "email": "gmail.com",
+        "birthday": "2000-02-02",
+        "group": "home",
+        "phones": [
+            {
+                "number": "87573453234",
+                "type": "home"
+            }
+        ]
+    }
+]

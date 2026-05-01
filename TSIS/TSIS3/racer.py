@@ -2,7 +2,12 @@ import pygame
 import random
 import os
 
-# ---------------- GAME OVER ----------------
+def load_trimmed(path):
+    img = pygame.image.load(path).convert_alpha()
+    rect = img.get_bounding_rect()
+    return img.subsurface(rect)
+
+# ---------- GAME OVER ----------
 def game_over_screen(screen, score):
     font_big = pygame.font.SysFont(None, 60)
     font = pygame.font.SysFont(None, 35)
@@ -10,20 +15,17 @@ def game_over_screen(screen, score):
     while True:
         screen.fill((30, 30, 30))
 
-        title = font_big.render("GAME OVER", True, (255, 0, 0))
-        screen.blit(title, (70, 150))
+        screen.blit(font_big.render("GAME OVER", True, (255,0,0)), (70,150))
+        screen.blit(font.render(f"Score: {score}", True, (255,255,255)), (140,250))
 
-        score_text = font.render(f"Score: {score}", True, (255, 255, 255))
-        screen.blit(score_text, (140, 250))
+        retry = pygame.Rect(120,320,160,50)
+        menu = pygame.Rect(120,390,160,50)
 
-        retry_rect = pygame.Rect(120, 320, 160, 50)
-        menu_rect = pygame.Rect(120, 390, 160, 50)
+        pygame.draw.rect(screen, (255,255,255), retry, 2)
+        pygame.draw.rect(screen, (255,255,255), menu, 2)
 
-        pygame.draw.rect(screen, (255,255,255), retry_rect, 2)
-        pygame.draw.rect(screen, (255,255,255), menu_rect, 2)
-
-        screen.blit(font.render("Retry", True, (255,255,255)), (150, 335))
-        screen.blit(font.render("Menu", True, (255,255,255)), (150, 405))
+        screen.blit(font.render("Retry", True, (255,255,255)), (150,335))
+        screen.blit(font.render("Menu", True, (255,255,255)), (150,405))
 
         pygame.display.update()
 
@@ -31,13 +33,13 @@ def game_over_screen(screen, score):
             if e.type == pygame.QUIT:
                 return "menu"
             if e.type == pygame.MOUSEBUTTONDOWN:
-                if retry_rect.collidepoint(e.pos):
+                if retry.collidepoint(e.pos):
                     return "retry"
-                if menu_rect.collidepoint(e.pos):
+                if menu.collidepoint(e.pos):
                     return "menu"
 
 
-# ---------------- ИГРА ----------------
+# ---------- MAIN GAME ----------
 def run_game(screen, settings):
 
     WIDTH, HEIGHT = 400, 600
@@ -46,53 +48,52 @@ def run_game(screen, settings):
     BASE = os.path.dirname(__file__)
     ASSETS = os.path.join(BASE, "assets")
 
-    # ----------- ВЫБОР МАШИНЫ -----------
+    # ---------- ДОРОГА ----------
+    road = pygame.image.load(os.path.join(ASSETS, "road.png"))
+    road = pygame.transform.scale(road, (WIDTH, HEIGHT))
+
+    y1 = 0
+    y2 = -HEIGHT
+
+    # ---------- ИГРОК ----------
     color = settings["car_color"]
 
     if color == "green":
-        player = pygame.image.load(os.path.join(ASSETS, "greenplayer.png"))
+        player = load_trimmed(os.path.join(ASSETS, "greenplayer.png"))
+        player = pygame.transform.scale(player, (50, 80))
+
     elif color == "yellow":
-        player = pygame.image.load(os.path.join(ASSETS, "yellplayer.png"))
+        player = load_trimmed(os.path.join(ASSETS, "yellplayer.png"))
+        player = pygame.transform.scale(player, (50, 80))
+
     else:
-        player = pygame.image.load(os.path.join(ASSETS, "bluePlayer.png"))
+        player = load_trimmed(os.path.join(ASSETS, "bluePlayer.png"))
+        player = pygame.transform.scale(player, (50, 80))
 
-    # ----------- ЗАГРУЗКА -----------
-    enemy = pygame.image.load(os.path.join(ASSETS, "Enemy.png"))
-    coin = pygame.image.load(os.path.join(ASSETS, "coin1.png"))  # 🔥 НОВАЯ МОНЕТА
-    nitro_img = pygame.image.load(os.path.join(ASSETS, "nitro.png"))
-    shield_img = pygame.image.load(os.path.join(ASSETS, "shield.png"))
-
-    # размеры
-    player = pygame.transform.scale(player, (50, 80))
+    # ---------- ВРАГ ----------
+    enemy = pygame.image.load(os.path.join(ASSETS, "Enemy.png")).convert_alpha()
     enemy = pygame.transform.scale(enemy, (50, 80))
-    coin = pygame.transform.scale(coin, (32, 32))  # 🔥 32x32
-    nitro_img = pygame.transform.scale(nitro_img, (32, 32))
-    shield_img = pygame.transform.scale(shield_img, (32, 32))
 
-    player = pygame.transform.rotate(player, 180)
+    # ---------- ОБЪЕКТЫ ----------
+    coin = pygame.image.load(os.path.join(ASSETS, "coin1.png")).convert_alpha()
+    coin = pygame.transform.scale(coin, (32,32))
 
-    # ----------- СЛОЖНОСТЬ -----------
-    difficulty = settings["difficulty"]
+    nitro_img = pygame.image.load(os.path.join(ASSETS, "nitro.png")).convert_alpha()
+    nitro_img = pygame.transform.scale(nitro_img, (32,32))
 
-    if difficulty == "easy":
-        base_speed = 3
-        spawn_delay = 70
-    elif difficulty == "hard":
-        base_speed = 7
-        spawn_delay = 30
-    else:
-        base_speed = 5
-        spawn_delay = 50
+    shield_img = pygame.image.load(os.path.join(ASSETS, "shield.png")).convert_alpha()
+    shield_img = pygame.transform.scale(shield_img, (32,32))
 
-    # ----------- ЗВУК -----------
+    # ---------- ЗВУК ----------
     if settings["sound"]:
         pygame.mixer.music.load(os.path.join(ASSETS, "background (1).wav"))
         pygame.mixer.music.play(-1)
 
-    crash_sound = pygame.mixer.Sound(os.path.join(ASSETS, "crash (1).wav"))
+    crash = pygame.mixer.Sound(os.path.join(ASSETS, "crash (1).wav"))
 
-    # ----------- ПЕРЕМЕННЫЕ -----------
-    px, py = WIDTH // 2, HEIGHT - 100
+    # ---------- ПЕРЕМЕННЫЕ ----------
+    px = WIDTH // 2
+    py = HEIGHT - 100
 
     enemies = []
     coins = []
@@ -102,19 +103,42 @@ def run_game(screen, settings):
     score = 0
 
     nitro_active = False
-    nitro_timer = 0
+    nitro_time = 0
     shield = False
 
     spawn_timer = 0
 
-    # ----------- ЦИКЛ -----------
+    # ---------- GAME LOOP ----------
     while True:
-        screen.fill((40, 40, 40))
 
+        # 🎯 СКОРОСТЬ С УРОВНЯМИ
+        base_speed = 5
+        multiplier = 1 + (score // 10) * 0.5
+        base_speed *= multiplier
+
+        if nitro_active:
+            speed = base_speed * 1.3
+            if pygame.time.get_ticks() - nitro_time > 4000:
+                nitro_active = False
+        else:
+            speed = base_speed
+
+        # ---------- ДВИЖЕНИЕ ДОРОГИ ----------
+        y1 += speed
+        y2 += speed
+
+        if y1 >= HEIGHT:
+            y1 = -HEIGHT
+        if y2 >= HEIGHT:
+            y2 = -HEIGHT
+
+        screen.blit(road, (0, y1))
+        screen.blit(road, (0, y2))
+
+        # ---------- EVENTS ----------
         for e in pygame.event.get():
             if e.type == pygame.QUIT:
-                if settings["sound"]:
-                    pygame.mixer.music.stop()
+                pygame.mixer.music.stop()
                 return score
 
         keys = pygame.key.get_pressed()
@@ -126,35 +150,24 @@ def run_game(screen, settings):
 
         px = max(0, min(WIDTH - 50, px))
 
-        # сложность растёт от очков
-        enemy_speed = base_speed + score * 0.2
-
-        # нитро
-        if nitro_active:
-            speed = enemy_speed * 1.3
-            if pygame.time.get_ticks() - nitro_timer > 4000:
-                nitro_active = False
-        else:
-            speed = enemy_speed
-
-        # спавн
+        # ---------- SPAWN ----------
         spawn_timer += 1
-        if spawn_timer > max(15, spawn_delay - score):
+        if spawn_timer > max(15, 50 - score):
 
-            enemies.append([random.randint(0, WIDTH - 50), -80])
-            coins.append([random.randint(0, WIDTH - 32), -32])
+            enemies.append([random.randint(0, WIDTH-50), -80])
+            coins.append([random.randint(0, WIDTH-32), -32])
 
             if random.random() < 0.15:
-                nitros.append([random.randint(0, WIDTH - 32), -32])
+                nitros.append([random.randint(0, WIDTH-32), -32])
 
             if random.random() < 0.1:
-                shields.append([random.randint(0, WIDTH - 32), -32])
+                shields.append([random.randint(0, WIDTH-32), -32])
 
             spawn_timer = 0
 
         player_rect = pygame.Rect(px, py, 50, 80)
 
-        # ----------- ВРАГИ -----------
+        # ---------- ВРАГИ ----------
         for e in enemies[:]:
             e[1] += speed
             screen.blit(enemy, e)
@@ -164,10 +177,8 @@ def run_game(screen, settings):
                     shield = False
                     enemies.remove(e)
                 else:
-                    if settings["sound"]:
-                        crash_sound.play()
-                        pygame.mixer.music.stop()
-
+                    crash.play()
+                    pygame.mixer.music.stop()
                     pygame.time.delay(300)
 
                     choice = game_over_screen(screen, score)
@@ -177,38 +188,38 @@ def run_game(screen, settings):
                     else:
                         return score
 
-        # ----------- МОНЕТЫ -----------
+        # ---------- МОНЕТЫ ----------
         for c in coins[:]:
-            c[1] += 4
+            c[1] += speed
             screen.blit(coin, c)
 
             if player_rect.colliderect(pygame.Rect(c[0], c[1], 32, 32)):
                 score += 1
                 coins.remove(c)
 
-        # ----------- НИТРО -----------
+        # ---------- НИТРО ----------
         for n in nitros[:]:
-            n[1] += 4
+            n[1] += speed
             screen.blit(nitro_img, n)
 
             if player_rect.colliderect(pygame.Rect(n[0], n[1], 32, 32)):
                 nitro_active = True
-                nitro_timer = pygame.time.get_ticks()
+                nitro_time = pygame.time.get_ticks()
                 nitros.remove(n)
 
-        # ----------- ЩИТ -----------
+        # ---------- ЩИТ ----------
         for s in shields[:]:
-            s[1] += 4
+            s[1] += speed
             screen.blit(shield_img, s)
 
             if player_rect.colliderect(pygame.Rect(s[0], s[1], 32, 32)):
                 shield = True
                 shields.remove(s)
 
-        # игрок
+        # ---------- ИГРОК ----------
         screen.blit(player, (px, py))
 
-        # UI
+        # ---------- UI ----------
         font = pygame.font.SysFont(None, 30)
         screen.blit(font.render(f"Score: {score}", True, (255,255,255)), (10,10))
 

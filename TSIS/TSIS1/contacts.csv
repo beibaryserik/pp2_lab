@@ -1,0 +1,4 @@
+name,email,birthday,group,phone,type
+Alex,alex@gmail.com,2005-01-01,Friends,87001234567,mobile
+Bob,bob@gmail.com,2004-05-10,Work,87005555555,work
+TestUser,,None,Family,87654321212,home
