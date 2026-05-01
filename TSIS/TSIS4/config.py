@@ -8,9 +8,10 @@ POWERUP_FIELD_TIME = 8000  # power-up disappears from field after (ms)
 OBSTACLE_START_LEVEL = 3
 TOP_BAR = 30               # pixels reserved for score/level HUD
 DB_CONFIG = {
-    "dbname": "snake_db",
-    "user": "postgres",
-    "password": "root",
+"dbname": "your_db",
+    "user": "your_user",
+    "password": "your_password",
     "host": "localhost",
-    "port": 5432,
+    "port": "5432",
+    "client_encoding": "UTF8"   # 🔥 ВОТ ЭТО ДОБАВЬ
 }

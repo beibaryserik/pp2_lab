@@ -10,7 +10,29 @@ from game import (
 )
 import db
 
+
 pygame.init()
+# ── MUSIC INIT ──
+import os
+
+try:
+    pygame.mixer.init()
+    MUSIC_LOADED = False
+
+    music_path = os.path.join(os.path.dirname(__file__), "music.wav")
+
+    if os.path.exists(music_path):
+        pygame.mixer.music.load(music_path)
+        pygame.mixer.music.set_volume(0.5)
+        MUSIC_LOADED = True
+    else:
+        print("Music file not found:", music_path)
+
+except Exception as e:
+    print("Music error:", e)
+    MUSIC_LOADED = False
+# ── MUSIC INIT ──
+
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Snake TSIS4")
 font       = pygame.font.SysFont(None, 36)
@@ -142,6 +164,13 @@ def settings_screen():
         snd_btn = pygame.Rect(WIDTH // 2 - 80, 170, 160, 40)
         snd_label = "Sound: ON" if settings["sound"] else "Sound: OFF"
         draw_button(snd_label, snd_btn, hover=snd_btn.collidepoint(mx, my))
+        # ── APPLY MUSIC ──
+        if MUSIC_LOADED:
+            if settings["sound"]:
+                if not pygame.mixer.music.get_busy():
+                    pygame.mixer.music.play(-1)
+            else:
+                pygame.mixer.music.stop()
 
         # Snake color picker
         clr_lbl = font_small.render("Snake Color:", True, colorWHITE)
@@ -306,6 +335,11 @@ def play_game(username):
 # ── Entry Point ──
 
 def main():
+    settings = load_settings()
+
+    if MUSIC_LOADED and settings["sound"]:
+        pygame.mixer.music.play(-1)
+
     username = text_input_screen("Enter your username:")
     while True:
         choice = main_menu()
