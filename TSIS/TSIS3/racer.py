@@ -55,20 +55,19 @@ def run_game(screen, settings):
     y1 = 0
     y2 = -HEIGHT
 
-    # ---------- ИГРОК ----------
-    color = settings["car_color"]
+    # ---------- БЕЗОПАСНЫЕ SETTINGS ----------
+    color = settings.get("car_color", "blue")
+    sound_on = settings.get("sound", True)
 
+    # ---------- ИГРОК ----------
     if color == "green":
         player = load_trimmed(os.path.join(ASSETS, "greenplayer.png"))
-        player = pygame.transform.scale(player, (50, 80))
-
     elif color == "yellow":
         player = load_trimmed(os.path.join(ASSETS, "yellplayer.png"))
-        player = pygame.transform.scale(player, (50, 80))
-
     else:
         player = load_trimmed(os.path.join(ASSETS, "bluePlayer.png"))
-        player = pygame.transform.scale(player, (50, 80))
+
+    player = pygame.transform.scale(player, (50, 80))
 
     # ---------- ВРАГ ----------
     enemy = pygame.image.load(os.path.join(ASSETS, "Enemy.png")).convert_alpha()
@@ -85,7 +84,7 @@ def run_game(screen, settings):
     shield_img = pygame.transform.scale(shield_img, (32,32))
 
     # ---------- ЗВУК ----------
-    if settings["sound"]:
+    if sound_on:
         pygame.mixer.music.load(os.path.join(ASSETS, "background (1).wav"))
         pygame.mixer.music.play(-1)
 

@@ -1,5 +1,5 @@
 {
-    "sound": true,
-    "difficulty": "easy",
-    "car_color": "green"
+  "sound": true,
+  "car_color": "blue",
+  "difficulty": "normal"
 }
