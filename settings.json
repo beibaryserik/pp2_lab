@@ -1,10 +1,10 @@
 {
     "snake_color": [
-        0,
         255,
-        0
+        210,
+        150
     ],
-    "grid": false,
-    "sound": false,
+    "grid": true,
+    "sound": true,
     "car_color": "yellow"
 }
