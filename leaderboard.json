@@ -8,6 +8,11 @@
         "score": 40
     },
     {
+        "name": "\u0430\u0432\u044b\u0432",
+        "score": 31,
+        "distance": 0
+    },
+    {
         "name": "\u044c",
         "score": 26
     },
@@ -34,9 +39,5 @@
     {
         "name": ".",
         "score": 10
-    },
-    {
-        "name": "kf",
-        "score": 9
     }
 ]
